@@ -50,12 +50,20 @@ export function authorizeSpotify() {
   });
 }
 
-export async function getAccessToken(code: string | string[]): Promise<string> {
+export async function getAccessToken(code: string | string[] | undefined): Promise<string | undefined> {
   return new Promise((res, rej) => {
     if(localStorage.getItem('spotify-token')) {
       res(localStorage.getItem('spotify-token') || '');
       return;
     }
+    // if(!code) {
+    //   code = localStorage.getItem('spotify-token') || undefined;
+    // }
+    if(!code) {
+      res(undefined);
+      return;
+    }
+
     const verifier = localStorage.getItem("code-verifier");
 
     const params = new URLSearchParams();
@@ -85,11 +93,17 @@ export async function getAccessToken(code: string | string[]): Promise<string> {
 }
 
 export async function fetchProfile(token: string): Promise<UserProfile> {
-  const headerToken = localStorage.getItem('spotify-token') || token;
-
-  const result = await fetch("https://api.spotify.com/v1/me", {
-      method: "GET", headers: { Authorization: `Bearer ${headerToken}` }
-  });
-
-  return await result.json();
+  return new Promise((res, rej) => {
+    fetch("https://api.spotify.com/v1/me", {
+        method: "GET", headers: { Authorization: `Bearer ${token}` }
+    })
+      .then((response) => {
+        if (!response.ok) {
+          rej(response.json())
+        } else {
+          return response.json();
+        }
+      })
+      .then((result) => res(result))
+  })
 }

@@ -13,30 +13,37 @@ const inter = Inter({ subsets: ['latin'] })
 
 export default function Home() {
   const [profile, setProfile] = useState<UserProfile | undefined>(undefined);
+  const [reauthorize, setReauthorize] = useState<Boolean>(false);
   const [error, setError] = useState<string>('');
   const router = useRouter();
   const { code } = router.query;
 
   useEffect(() => {
-    const savedtoken = window.localStorage.getItem('spotify-token');
-    if (savedtoken) {
-      router.replace('/', undefined, { shallow: true });
-      fetchProfile(savedtoken).then((profile) => {
-        setProfile(profile);
-      })
-    } else if (code) {
-      getAccessToken(code)
-        .then((token) => {
+    getAccessToken(code)
+      .then((token) => {
+        if(token) {
           router.replace('/', undefined, { shallow: true });
+          window.localStorage.setItem('spotify-token', token);
           fetchProfile(token).then((profile) => {
             setProfile(profile);
           })
-        })
-        .catch((error) => {
-          setError(error.error_description)
-        })
-    }
+          .catch((error) => {
+            setError(error.error_description)
+            setReauthorize(true);
+          })
+        }
+      })
+      .catch((error) => {
+        setReauthorize(true);
+        setError(error.error_description)
+      })
   }, [code]);
+
+  useEffect(() => {
+    if(reauthorize) {
+      window.localStorage.removeItem('spotify-token');
+    }
+  }, [reauthorize])
   return (
     <>
       <Head>
@@ -45,20 +52,23 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main>
+      <main className={inter.className}>
         <div>
           <button onClick={() => authorizeSpotify()}>
             Click to auth
           </button>
           { profile && <div>
-            {/* <Image
+            <Image
               src={profile.images[0].url}
               alt="Picture of the author"
-              width={500}
-              height={500}
-            /> */}
-            { profile.display_name }
+              width={80}
+              height={80}
+            />
+            Name: { profile.display_name }
+            Followers: { profile.followers.total }
+            Status: { profile.product }
           </div> }
+          { reauthorize && <div>{ reauthorize && 'You need to reauthenticate with spotify' }</div> }
           { error && <div>{ error }</div> }
         </div>
       </main>
