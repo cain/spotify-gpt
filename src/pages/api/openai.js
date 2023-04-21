@@ -7,14 +7,18 @@ const configuration = new Configuration({
 const openai = new OpenAIApi(configuration);
 
 export default async function handler (req, res) {
-  if (req.body.prompt !== undefined) {
-    const completion = await openai.createCompletion({
-      model: "text-davinci-003",
-      prompt: `${req.body.prompt}`,
-    });
-
-    res.status(200).json({ text: `${completion.data.choices[0].text}` });
-  } else {
-    res.status(400).json({ text: "No prompt provided." });
+  try {
+    if (req.body.prompt !== undefined) {
+      const completion = await openai.createCompletion({
+        model: "text-davinci-003",
+        prompt: req.body.prompt,
+      });
+  
+      res.status(200).json(completion.data);
+    } else {
+      res.status(400).json({ text: "No prompt provided." });
+    }
+  } catch (error) {
+    res.status(500).json(error)
   }
 };
