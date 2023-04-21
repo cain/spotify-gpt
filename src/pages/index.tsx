@@ -12,15 +12,15 @@ import { authorizeSpotify, getAccessToken, fetchProfile, fetchUsersTopArtists } 
 const inter = Inter({ subsets: ['latin'] })
 
 export default function Home() {
-  const [profile, setProfile] = useState<SpotifyApi.CurrentUsersProfileResponse | undefined>(undefined);
-  const [userTopArtists, setUserTopArtists] = useState<SpotifyApi.UsersTopArtistsResponse | undefined>(undefined);
+  const [profile, setProfile] = useState<SpotifyApi.CurrentUsersProfileResponse>();
+  const [userTopArtists, setUserTopArtists] = useState<SpotifyApi.UsersTopArtistsResponse>();
   const [reauthorize, setReauthorize] = useState<Boolean>(false);
   const [error, setError] = useState<string>('');
   const router = useRouter();
   const { code } = router.query;
 
   useEffect(() => {
-    getAccessToken(code)
+    getAccessToken(`${code}`)
       .then((token) => {
         if(token) {
           router.replace('/', undefined, { shallow: true });
