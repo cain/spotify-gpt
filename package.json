@@ -10,7 +10,6 @@
   },
   "dependencies": {
     "@types/node": "18.15.11",
-    "@types/react": "18.0.31",
     "@types/react-dom": "18.0.11",
     "@types/spotify-api": "^0.0.21",
     "eslint": "8.37.0",
@@ -19,5 +18,9 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "typescript": "5.0.2"
+  },
+  "devDependencies": {
+    "@types/react": "18.0.37",
+    "openai": "^3.2.1"
   }
 }
