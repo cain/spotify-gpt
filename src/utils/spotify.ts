@@ -1,7 +1,8 @@
-// const clientId = process.env.SPOTIFY_CLIENT_ID;
-// const redirectUri = process.env.SPOTIFY_REDIRECT_URL;;
-const clientId = '7afd9e1603fd419dbf02f2488f4f8d4d';
-const redirectUri = 'http://localhost:3000';
+const clientId = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID;
+const redirectUri = process.env.NEXT_PUBLIC_SPOTIFY_REDIRECT_URL;
+
+// const clientId = '7afd9e1603fd419dbf02f2488f4f8d4d';
+// const redirectUri = 'http://localhost:3000';
 
 export function generateRandomString(length: number) {
   let text = '';
@@ -33,7 +34,7 @@ export function authorizeSpotify() {
 
   generateCodeChallenge(codeVerifier).then(codeChallenge => {
     let state = generateRandomString(16);
-    let scope = 'user-read-private user-read-email';
+    let scope = 'user-read-private user-read-email user-top-read';
   
     localStorage.setItem('code-verifier', codeVerifier);
     let args = new window.URLSearchParams({
@@ -56,9 +57,6 @@ export async function getAccessToken(code: string | string[] | undefined): Promi
       res(localStorage.getItem('spotify-token') || '');
       return;
     }
-    // if(!code) {
-    //   code = localStorage.getItem('spotify-token') || undefined;
-    // }
     if(!code) {
       res(undefined);
       return;
@@ -100,6 +98,24 @@ export async function fetchProfile(token: string): Promise<UserProfile> {
       .then((response) => {
         if (!response.ok) {
           rej(response.json())
+        } else {
+          return response.json();
+        }
+      })
+      .then((result) => res(result))
+  })
+}
+
+export async function fetchUsersTopArtists(token: string, type: 'artists' | 'tracks'): Promise<SpotifyApi.UsersTopArtistsResponse | SpotifyApi.UsersTopTracksResponse> {
+  var url = new URL(`https://api.spotify.com/v1/me/top/${type}`)
+  url.search = new URLSearchParams({ }).toString();
+  return new Promise((res, rej) => {
+    fetch(url, {
+        method: "GET", headers: { Authorization: `Bearer ${token}` }
+    })
+      .then((response) => {
+        if (!response.ok) {
+          rej(response)
         } else {
           return response.json();
         }

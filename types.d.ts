@@ -1,3 +1,5 @@
+// Spotify types from https://www.npmjs.com/package/@types/spotify-api
+import * as SpotifyApi from '@types/spotify-api';
 interface UserProfile {
   country: string;
   display_name: string;
