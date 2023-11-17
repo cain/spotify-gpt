@@ -121,3 +121,21 @@ export async function fetchUsersTopArtists(token: string, type: 'artists' | 'tra
       .then((result) => res(result))
   })
 }
+
+export async function fetchSeveralArtists(token: string, ids: string): Promise<SpotifyApi.MultipleArtistsResponse> {
+  var url = new URL('https://api.spotify.com/v1/artists')
+  url.searchParams.append('ids', ids)
+  return new Promise((res, rej) => {
+    fetch(url, {
+        method: "GET", headers: { Authorization: `Bearer ${token}` }
+    })
+      .then((response) => {
+        if (!response.ok) {
+          rej(response)
+        } else {
+          return response.json();
+        }
+      })
+      .then((result) => res(result))
+  })
+}

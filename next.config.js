@@ -7,6 +7,7 @@ const nextConfig = {
   },
   images: {
     remotePatterns: [
+      // Spotify CDN
       {
         protocol: 'https',
         hostname: "i.scdn.co",
